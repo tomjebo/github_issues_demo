@@ -10,7 +10,7 @@
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
     "start": "func start",
-    "test": "echo \"No tests yet...\"",
+    "test": "npm run build && node --test \"dist/tests/**/*.test.js\"",
     "storage": "azurite --silent --location ./_storage_emulator --debug ./_storage_emulator/debug.log",
     "prettier:check": "prettier --check \"./src/**/*.{ts,json}\"",
     "prettier:write": "prettier --write \"./src/**/*.{ts,json}\"",
