@@ -30,7 +30,7 @@ async function loadContent(config: Config, item: ExternalConnectors.ExternalItem
     if (e.body) {
       config.context.error(`${JSON.parse(e.body, null)?.innerError?.message ?? ""}`);
     }
-    return;
+    throw e;
   }
 }
 

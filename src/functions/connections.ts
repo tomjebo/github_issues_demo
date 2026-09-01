@@ -57,20 +57,16 @@ export async function fullCrawl(timer: Timer, context: InvocationContext): Promi
   }
 
   fullCrawlInProgress = true;
-  const lastCrawl = await getLastCrawl();
   const nextCrawl = new Date();
 
-  context.log("Starting full crawl...");
-  // Starts the full ingestion of the contents
-  // If the function is running locally, it will use the last crawl date from the file system as the starting point
-  // Delete the last crawl file to force a full crawl
-  await ingestContent(
-    config,
-    process.env.AZURE_FUNCTIONS_ENVIRONMENT === "Development" ? lastCrawl : undefined
-  );
-  await saveLastCrawl(nextCrawl);
-  fullCrawlInProgress = false;
-  context.log("Finished full crawl...");
+  try {
+    context.log("Starting full crawl...");
+    await ingestContent(config);
+    await saveLastCrawl(nextCrawl);
+    context.log("Finished full crawl...");
+  } finally {
+    fullCrawlInProgress = false;
+  }
 }
 
 /**
@@ -183,14 +179,14 @@ app.timer("deployConnection", {
 
 app.timer("fullCrawl", {
   // Runs every day at midnight
-  schedule: "0 0 * * *",
+  schedule: "0 0 0 * * *",
   runOnStartup: false,
   handler: fullCrawl,
 });
 
 app.timer("incrementalCrawl", {
   // Runs every minute
-  schedule: "* * * * *",
+  schedule: "0 * * * * *",
   runOnStartup: false,
   handler: incrementalCrawl,
 });
